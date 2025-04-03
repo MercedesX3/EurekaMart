@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     top: 130,
     backgroundColor: '#588981',
     height: 49,
-    width: 206,
+    width: 220,
     borderRadius: 50,
     alignSelf: 'flex-start',
     marginLeft: '10%',
