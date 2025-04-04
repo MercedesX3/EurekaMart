@@ -1,3 +1,5 @@
+package backend;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
@@ -16,6 +18,14 @@ public class Item{
         this.itemDesc = itemDesc;
         this.tags = tags;
     }
+
+    public Item(String itemName, int quantity, String imagePath) {
+        this.itemName = itemName;
+        this.itemID = 0; // Default/filler ID
+        this.itemType = ""; // Default/filler
+        this.itemDesc = imagePath; // Assign imagePath to description for now
+        this.tags = new ArrayList<>();
+    }    
 
     public String GetItemType(){
         return itemType;

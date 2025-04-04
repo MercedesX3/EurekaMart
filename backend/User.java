@@ -1,3 +1,6 @@
+package backend;
+import java.util.List;
+
 public class User {
     private final String username;
     private final String password;
@@ -43,5 +46,24 @@ public class User {
         return "Something went wrong\n";
     }
 
+    public static String searchRecipe(String itemName) {
+    if (itemName == null || itemName.trim().isEmpty()) {
+        return "Item name cannot be empty.";
+    }
+
+    List<String> availableRecipes = List.of(
+        "Chicken Tortilla",
+        "Chocolate Nutella",
+        "Pasta"
+    );
+
+    for (String recipe : availableRecipes) {
+        if (recipe.equalsIgnoreCase(itemName.trim())) {
+            return "Recipe found: " + recipe;
+        }
+    }
+
+    return "Item not found.";
+}
 
 }

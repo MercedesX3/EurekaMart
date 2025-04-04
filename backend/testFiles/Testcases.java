@@ -20,10 +20,6 @@ public class Testcases {
         assertEquals("Something went wrong\n", user.logout());
     }
 
-
-
-
-
     // add new item - InventoryManager.addNewItem(Str name, int quantity, Str imagePath)
     @Test
     void addItem_TC1() // valid item added to inventory
