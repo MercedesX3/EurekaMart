@@ -1,5 +1,5 @@
-import { StyleSheet, TextInput} from 'react-native';
-
+import { StyleSheet, TextInput, TouchableOpacity} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
@@ -17,6 +17,7 @@ import {
 } from '@expo-google-fonts/inter';
 
 export default function TabTwoScreen() {
+  const navigation = useNavigation();
 
   let [fontsLoaded] = useFonts({
     Inter_100Thin,
@@ -29,6 +30,10 @@ export default function TabTwoScreen() {
     Inter_800ExtraBold,
     Inter_900Black,
   });
+
+  const handleSignUpPress = () => {
+    navigation.navigate('signup');  // Navigate to the SignUp screen
+  };
 
   return (
     <View style={styles.container}>
@@ -54,7 +59,9 @@ export default function TabTwoScreen() {
         </Text>
         <View style={{backgroundColor: 'none', flexDirection: 'row', paddingVertical: 20}}>
           <Text style={[styles.inputText, {color: 'white'}]}>Don't have an account? </Text>
-          <Text style={[styles.inputText, {color: '#F9C784'}]}>Sign Up</Text>
+          <TouchableOpacity onPress={handleSignUpPress}>
+            <Text style={[styles.inputText, { color: '#F9C784' }]}>Sign Up</Text>
+          </TouchableOpacity>
         </View>
         <View style={[styles.inputBox, {backgroundColor: '#F9C784', borderWidth: 0, alignItems: 'center'}]}>
           <Text style={{color: 'white', fontFamily: 'Inter_600SemiBold'}}>Sign In</Text>

@@ -3,3 +3,10 @@
 
 # Ignore Gradle build output directory
 build
+
+server/node_modules
+.env
+
+# setting up server
+cd server
+npm i express
