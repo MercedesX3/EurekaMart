@@ -62,16 +62,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="home"
+        name="profile"
         options={{
-          title: 'Home Screen',
+          title: "Profile",
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="camera"
+        name="home"
         options={{
-          title: 'Camera Screen',
+          title: 'Home Screen',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />
