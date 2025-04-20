@@ -12,12 +12,14 @@ import {
   Inter_800ExtraBold,
   Inter_900Black,
 } from '@expo-google-fonts/inter';
+import { useNavigation } from 'expo-router';
 
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 
 export default function TabOneScreen() {
-  
+  const navigation = useNavigation();
+
   let [fontsLoaded] = useFonts({
     Inter_100Thin,
     Inter_200ExtraLight,
@@ -37,7 +39,7 @@ export default function TabOneScreen() {
         <Text style={styles.title}>Welcome to</Text>
         <Text style={styles.title}>Eureka Mart</Text>
       </View>
-      <Pressable style={styles.getStartedButton}>
+      <Pressable style={styles.getStartedButton} onPress={()=> {navigation.navigate('two')}}>
         <Text style={styles.getStartedText}>
           Get Started
         </Text>

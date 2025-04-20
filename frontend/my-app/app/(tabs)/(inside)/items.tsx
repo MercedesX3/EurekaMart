@@ -1,7 +1,10 @@
-import { StyleSheet, Pressable, ScrollView, ImageBackground} from 'react-native';
-import React from 'react';
+import { StyleSheet, Pressable, ScrollView, ImageBackground, SafeAreaView} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import Colors from '@/constants/Colors';
 import { Text, View } from '@/components/Themed';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 import {
   useFonts,
@@ -18,6 +21,8 @@ import {
 import RecipeData from '@/assets/data/recipe.json';
 
 export default function ItemsScreen() {
+    const [items, setItems] = useState([]);
+
     let [fontsLoaded] = useFonts({
         Inter_100Thin,
         Inter_200ExtraLight,
@@ -34,6 +39,21 @@ export default function ItemsScreen() {
         return ['Cheese Quesidilla', 'Sweet Mango Rice', "CheeseSteak", "Pizza", "Soda"];
     }
 
+    const fetchItems = async () => { 
+        const token = await AsyncStorage.getItem('token');
+        try {
+          const response = await axios.post("http://127.0.0.1:5001/get-item", {}, {
+            headers: {
+              Authorization: token,
+            },
+          });
+          console.log(response.data)
+          setItems(response.data);
+        } catch (error) {
+          console.error("Error fetching name:", error.response?.data || error.message);
+        }
+    }
+
     const recipesForYou = getRecipesForYou();
 
     const getRecipeData = (input: any) => {
@@ -46,9 +66,33 @@ export default function ItemsScreen() {
         return recipe ? recipe.time : null;
     };
 
+    const getCategories = () => {
+        return ['Chinese', 'Vegetarian', 'American', 'Italian', 'Mexican'];
+    };
+    
+    const categories = getCategories();
+
+    useEffect(() => {
+        fetchItems();
+    }, []);
+
     return (
-        <View style={styles.container}>
-            <Text style={{marginVertical: 50}}>Item Screen</Text>
+        <SafeAreaView style={styles.container}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={styles.profileCircle}/>
+            <Text style={styles.profileNameText}>Your refrigerator</Text>
+            <Text style={{color: 'rgba(88, 137, 129, 0.57)', fontSize: 20, fontFamily: "Inter_600SemiBold"}}>Let's see what you have!</Text>
+
+            {/* categories */}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
+                {categories.map((category, index) => (
+                    <Pressable key={index} style={[styles.categoryButton, {paddingHorizontal: 20,
+                        paddingVertical: 10,}]}>
+                        <Text style={styles.categoryText}>{category}</Text>
+                    </Pressable>
+                ))}
+            </ScrollView>
+
             <ScrollView contentContainerStyle={styles.gridContainer}>
             {recipesForYou.map((recipeName, index) => {
                 const recipeImage = getRecipeData(recipeName);
@@ -68,8 +112,8 @@ export default function ItemsScreen() {
                 );
             })}
             </ScrollView>
-
-        </View>
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 
@@ -77,16 +121,18 @@ export default function ItemsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginHorizontal: 30,
-        marginVertical: 10,
-        backgroundColor: 'white',
+        marginLeft: 30,
+        marginTop: 10,
+        marginBottom: -40,
     },
     profileCircle: {
+        marginTop: 10,
         height: 40,
         width: 40,
         borderRadius: 20,
         backgroundColor: '#D9D9D9',
         alignSelf: 'flex-end',
+        marginRight: 20,
     },
     profileNameText: {
         fontFamily: "Inter_600SemiBold",
@@ -95,7 +141,7 @@ const styles = StyleSheet.create({
     },
     categoriesContainer: {
         flexDirection: 'row',
-        marginVertical: 20,
+        marginTop: 20,
     },
     categoryButton: {
         backgroundColor: Colors.light.orangeyellow,

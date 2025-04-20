@@ -23,10 +23,11 @@ const SignUpScreen = () => {
     .post("http://localhost:5001/register", userData)
     .then(res => console.log(res.data))
     .catch(e => console.log(e));
+    navigation.navigate('(inside)');  // Make sure 'home' is defined as a screen
   }
 
-  const handleSignUpPress = () => {
-    navigation.navigate('signup');  // Navigate to the SignUp screen
+  const handlelogin = () => {
+    navigation.navigate('two');  // Navigate to the SignUp screen
   };
 
   return (
@@ -63,7 +64,7 @@ const SignUpScreen = () => {
 
       <View style={{backgroundColor: 'none', flexDirection: 'row', paddingVertical: 20}}>
       <Text style={[styles.inputText, {color: 'white'}]}>Don't have an account? </Text>
-          <TouchableOpacity onPress={handleSignUpPress}>
+          <TouchableOpacity onPress={handlelogin}>
             <Text style={[styles.inputText, { color: '#F9C784' }]}>Sign Up</Text>
           </TouchableOpacity>
       </View>

@@ -1,8 +1,12 @@
 const express=require("express");
 const app = express();
+app.use(express.json());
 const mongoose = require("mongoose");
 require("dotenv").config();
-app.use(express.json());
+
+const jwt = require('jsonwebtoken');
+const jwt_password = process.env.JWT_KEY;
+const bcrypt = require('bcryptjs');
 
 const mongoURL = process.env.MONGO_URL;
 
@@ -31,13 +35,102 @@ app.post('/register', async(req, res) => {
         await User.create({
             name: name,
             email: email,
-            password, password,
+            password: password,
         });
         res.send({status: "ok", data: "user created"});
     } catch (err) {
         res.send({status: "error", data: error});
     }
 })
+
+app.post('/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      console.log("BOBBY");
+  
+      // Finding user
+      const oldUser = await User.findOne({ email: email });
+
+      console.log("YEs");
+      if(oldUser) {
+        if(oldUser.password === password) {
+            const token = jwt.sign({ id: oldUser._id }, jwt_password, { expiresIn: "1h" });
+            res.json({ status: "ok", token });
+        }
+        else {
+            res.json("Password was incorrect")
+        }
+      } else {
+        res.json("No record existed");
+      }
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    }
+  });
+
+app.post('/get-name', async (req, res) => {
+    const token = req.headers["authorization"];
+    try {
+        const decoded = jwt.verify(token, jwt_password);
+        const userId = decoded.id;
+
+        const oldUser = await User.findById(userId);
+        if (!oldUser) {
+            return res.status(404).json({ status: "error", message: "User not found" });
+        }
+
+        res.status(200).json({ status: "ok", name: oldUser.name });
+
+        
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({ status: "error", message: "Could not get name" });
+    }
+})
+
+app.post("/get-item", async (req, res) => {
+    const token = req.headers["authorization"];
+    try {
+        const decoded = jwt.verify(token, jwt_password);
+        const userId = decoded.id;
+
+        const oldUser = await User.findById(userId);
+        if (!oldUser) {
+            return res.status(404).json({ status: "error", message: "User not found" });
+        }
+
+        res.status(200).json({ status: "ok", name: oldUser.items });
+    } catch (err) {
+        console.log(err);
+        res.status(400).json({ status: "error", message: "Could not get items" });
+    }
+})
+
+app.post("/add-item", async (req, res) => {
+    const token = req.headers["authorization"];
+
+    try {
+        const decoded = jwt.verify(token, jwt_password);
+        const userId = decoded.id;
+
+        const { itemName, quantity } = req.body;
+        const newItem = { itemName, quantity };
+
+        const result = await User.findByIdAndUpdate(
+            userId,
+            { $push: { items: newItem } },
+            { new: true }
+        );
+
+        res.status(200).json({ message: "Item added!", user: result });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ status: "error", message: "Could not add item" });
+    }
+});
+
 
 app.listen(5001,()=> {
     console.log("Node js server started");

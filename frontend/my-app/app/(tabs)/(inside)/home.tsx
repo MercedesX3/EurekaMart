@@ -1,9 +1,14 @@
-import { StyleSheet, Pressable, ScrollView, ImageBackground } from 'react-native';
-import React from 'react';
+import { Animated, StyleSheet, Pressable, ScrollView, ImageBackground } from 'react-native';
+import React, {useEffect, useState} from 'react';
 import Colors from '@/constants/Colors';
+import {useRef} from 'react';
 
 import { Text, View } from '@/components/Themed';
 import RecipeData from '@/assets/data/recipe.json';
+import Popup from '@/components/popup';
+
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {
   useFonts,
@@ -32,6 +37,26 @@ export default function HomeScreen() {
         Inter_900Black,
       });
 
+    const [name, setName] = useState("");
+
+    const fetchName = async () => {
+        const token = await AsyncStorage.getItem('token');
+        try {
+          const response = await axios.post("http://127.0.0.1:5001/get-name", {}, {
+            headers: {
+              Authorization: token,
+            },
+          });
+          setName(response.data.name);
+        } catch (error) {
+          console.error("Error fetching name:", error.response?.data || error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchName();
+    }, []);
+
     const getCategories = () => {
         return ['Chinese', 'Vegetarian', 'American', 'Italian', 'Mexican'];
     };
@@ -58,7 +83,7 @@ export default function HomeScreen() {
         <SafeAreaView style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.profileCircle}/>
-            <Text style={styles.profileNameText}>Hello Name</Text>
+            <Text style={styles.profileNameText}>Hello {name || '...'}</Text>
             <Text style={{color: 'rgba(88, 137, 129, 0.57)', fontSize: 20, fontFamily: "Inter_600SemiBold"}}>Let's start cooking</Text>
 
             {/* categories */}
@@ -136,8 +161,8 @@ export default function HomeScreen() {
                     );
                 })}
             </ScrollView>
-
             </ScrollView>
+            <Popup style={{ position: "absolute", bottom: 60, alignSelf: 'flex-end', right: 20}} />
         </SafeAreaView>
     )
 }
@@ -145,8 +170,9 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginHorizontal: 30,
-        marginVertical: 10,
+        marginLeft: 30,
+        marginTop: 10,
+        marginBottom: -40,
     },
     profileCircle: {
         height: 40,
@@ -154,6 +180,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         backgroundColor: '#D9D9D9',
         alignSelf: 'flex-end',
+        marginRight: 20,
     },
     profileNameText: {
         fontFamily: "Inter_600SemiBold",

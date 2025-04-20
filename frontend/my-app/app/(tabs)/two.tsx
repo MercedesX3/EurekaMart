@@ -1,8 +1,9 @@
-import { StyleSheet, TextInput, TouchableOpacity} from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, Button, Pressable} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState } from 'react';
 import {
   useFonts,
   Inter_100Thin,
@@ -15,9 +16,13 @@ import {
   Inter_800ExtraBold,
   Inter_900Black,
 } from '@expo-google-fonts/inter';
+import { jwtDecode } from 'jwt-decode';
+import axios from 'axios';
 
 export default function TabTwoScreen() {
   const navigation = useNavigation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   let [fontsLoaded] = useFonts({
     Inter_100Thin,
@@ -35,6 +40,26 @@ export default function TabTwoScreen() {
     navigation.navigate('signup');  // Navigate to the SignUp screen
   };
 
+  async function handleLogin() {
+
+    console.log("Bobby")
+    try {
+      const response = await axios.post("http://127.0.0.1:5001/login", {
+        email,
+        password,
+      })
+      
+      if(response.data.status === "ok") {
+          await AsyncStorage.setItem('token', response.data.token);
+          console.log(response.data.token)
+          navigation.navigate('(inside)');
+        }
+    } catch (error) {
+      console.error('Login error:', error.response ? error.response.data : error.message);
+    }
+  }
+  
+
   return (
     <View style={styles.container}>
       <View style={{paddingVertical: 50}}>
@@ -45,13 +70,15 @@ export default function TabTwoScreen() {
         <View style={styles.inputBox}>
           <TextInput
             style={styles.inputText}
-            placeholder="Username"
+            placeholder="Email"
+            onChangeText={setEmail}
           />
         </View>
         <View style={styles.inputBox}>
           <TextInput
             style={styles.inputText}
             placeholder="Password"
+            onChangeText={setPassword}
           />
         </View>
         <Text style={[styles.inputText, {color: '#F9C784'}]}>
@@ -63,9 +90,14 @@ export default function TabTwoScreen() {
             <Text style={[styles.inputText, { color: '#F9C784' }]}>Sign Up</Text>
           </TouchableOpacity>
         </View>
+
+        
         <View style={[styles.inputBox, {backgroundColor: '#F9C784', borderWidth: 0, alignItems: 'center'}]}>
-          <Text style={{color: 'white', fontFamily: 'Inter_600SemiBold'}}>Sign In</Text>
+          <Pressable onPress={handleLogin}>
+            <Text style={{color: 'white', fontFamily: 'Inter_600SemiBold'}}>Sign In</Text>
+          </Pressable>
         </View>
+
         <View style={[styles.inputBox, {backgroundColor: 'white',alignItems: 'center'}]}>
           <Text style={{color: 'black', fontFamily: 'Inter_600SemiBold'}}> Log in with Google</Text>
         </View>
