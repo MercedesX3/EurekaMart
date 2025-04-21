@@ -9,6 +9,8 @@ const jwt_password = process.env.JWT_KEY;
 const bcrypt = require('bcryptjs');
 
 const mongoURL = process.env.MONGO_URL;
+const SPOONACULAR_API_KEY = process.env.SPOONACULAR_KEY;
+const axios = require("axios");
 
 mongoose.connect(mongoURL).then(()=> {
     console.log("DB Connected")
@@ -46,12 +48,10 @@ app.post('/register', async(req, res) => {
 app.post('/login', async (req, res) => {
     try {
       const { email, password } = req.body;
-      console.log("BOBBY");
   
       // Finding user
       const oldUser = await User.findOne({ email: email });
-
-      console.log("YEs");
+      console.log("BOBBY");
       if(oldUser) {
         if(oldUser.password === password) {
             const token = jwt.sign({ id: oldUser._id }, jwt_password, { expiresIn: "1h" });
@@ -69,6 +69,12 @@ app.post('/login', async (req, res) => {
       res.status(500).send('Server error');
     }
   });
+  
+  app.post("/signout", (req, res) => {
+    // On client: remove token from storage.
+    // On server: optionally log signout activity or invalidate token if using a token blacklist system.
+    res.status(200).json({ status: "ok", message: "Signed out successfully" });
+});
 
 app.post('/get-name', async (req, res) => {
     const token = req.headers["authorization"];
@@ -131,6 +137,27 @@ app.post("/add-item", async (req, res) => {
     }
 });
 
+app.post("/get-recipe", async(req, res) => {
+    const items = req.body.items;
+    // const ingredients = items.map(item => item.itemName).join(",");
+    const ingredients = "apples,flour,sugar";
+    console.log("DAVE");
+    try {
+        const response = await axios.get(
+        `https://api.spoonacular.com/recipes/findByIngredients`,
+        {
+            params: {
+            ingredients,
+            number: 5,
+            apiKey: SPOONACULAR_API_KEY,
+            },
+        }
+        )
+        console.log(response);
+    } catch (err) {
+        console.error(err);
+    }
+});
 
 app.listen(5001,()=> {
     console.log("Node js server started");

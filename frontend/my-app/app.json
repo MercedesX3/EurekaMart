@@ -3,6 +3,9 @@
     "name": "my-app",
     "slug": "my-app",
     "version": "1.0.0",
+    "extra": {
+      "unsplashApiKey": "-iFsG8Woa6NJCA3P4XiZh-y26dNs2Wg4Czh0cELoAKk"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",

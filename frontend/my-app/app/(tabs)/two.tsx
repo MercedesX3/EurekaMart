@@ -49,6 +49,7 @@ export default function TabTwoScreen() {
         password,
       })
       
+      console.log(response.data.status);
       if(response.data.status === "ok") {
           await AsyncStorage.setItem('token', response.data.token);
           console.log(response.data.token)

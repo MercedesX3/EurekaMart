@@ -2,6 +2,7 @@ import { Animated, StyleSheet, Pressable, ScrollView, ImageBackground } from 're
 import React, {useEffect, useState} from 'react';
 import Colors from '@/constants/Colors';
 import {useRef} from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 import { Text, View } from '@/components/Themed';
 import RecipeData from '@/assets/data/recipe.json';
@@ -25,6 +26,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
+    const navigation = useNavigation();
+
     let [fontsLoaded] = useFonts({
         Inter_100Thin,
         Inter_200ExtraLight,
@@ -38,6 +41,8 @@ export default function HomeScreen() {
       });
 
     const [name, setName] = useState("");
+    const [items, setItems] = useState([]);
+    const [recipes, setRecipes] = useState([]);
 
     const fetchName = async () => {
         const token = await AsyncStorage.getItem('token');
@@ -53,8 +58,38 @@ export default function HomeScreen() {
         }
     };
 
+    const fetchItems = async () => { 
+        const token = await AsyncStorage.getItem('token');
+        try {
+          const response = await axios.post("http://127.0.0.1:5001/get-item", {}, {
+            headers: {
+              Authorization: token,
+            },
+          });
+          setItems(response.data.name);
+        } catch (error) {
+          console.error("Error fetching name:", error.response?.data || error.message);
+        }
+    }
+
+    const fetchRecipes = async () => {
+        try {
+            const response = await axios.post("http://127.0.0.1:5001/get-recipe", {items});
+            setRecipes(response.data);
+            console.log(response.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     useEffect(() => {
-        fetchName();
+        const fetchAll = async () => {
+            await fetchName();
+            await fetchItems();
+            console.log(items);
+            await fetchRecipes();
+        }
+        fetchAll();
     }, []);
 
     const getCategories = () => {
@@ -82,7 +117,7 @@ export default function HomeScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={styles.profileCircle}/>
+            <Pressable onPress={() => {navigation.navigate('profile')}} style={styles.profileCircle}/>
             <Text style={styles.profileNameText}>Hello {name || '...'}</Text>
             <Text style={{color: 'rgba(88, 137, 129, 0.57)', fontSize: 20, fontFamily: "Inter_600SemiBold"}}>Let's start cooking</Text>
 

@@ -5,6 +5,7 @@ import { Text, View } from '@/components/Themed';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import Popup from '@/components/popup';
 
 import {
   useFonts,
@@ -19,6 +20,8 @@ import {
   Inter_900Black,
 } from '@expo-google-fonts/inter';
 import RecipeData from '@/assets/data/recipe.json';
+
+const UNSPLASH_API_KEY = "-iFsG8Woa6NJCA3P4XiZh-y26dNs2Wg4Czh0cELoAKk";
 
 export default function ItemsScreen() {
     const [items, setItems] = useState([]);
@@ -35,9 +38,26 @@ export default function ItemsScreen() {
         Inter_900Black,
       });
 
-      const getRecipesForYou = () => {
-        return ['Cheese Quesidilla', 'Sweet Mango Rice', "CheeseSteak", "Pizza", "Soda"];
-    }
+    const fetchUnsplashImage = async (query) => {
+        try {
+          const res = await axios.get(`https://api.unsplash.com/search/photos`, {
+            params: {
+              query: query,
+              per_page: 1, // Just get one image per item
+            },
+            headers: {
+              Authorization: `Client-ID ${UNSPLASH_API_KEY}`,
+            },
+          });
+      
+          const imageUrl = res.data.results[0]?.urls?.regular;
+          console.log(imageUrl);
+          return imageUrl;
+        } catch (error) {
+          console.error("Error fetching Unsplash image:", error);
+          return null;
+        }
+    };
 
     const fetchItems = async () => { 
         const token = await AsyncStorage.getItem('token');
@@ -47,24 +67,27 @@ export default function ItemsScreen() {
               Authorization: token,
             },
           });
-          console.log(response.data)
-          setItems(response.data);
+          setItems(response.data.name);
+          attachImagesToItems(response.data.name);
         } catch (error) {
           console.error("Error fetching name:", error.response?.data || error.message);
         }
     }
 
-    const recipesForYou = getRecipesForYou();
-
-    const getRecipeData = (input: any) => {
-        const recipe = RecipeData.find((recipe: { id: any; }) => recipe.id === input);
-        return recipe ? recipe.photoURL : null;
+    const attachImagesToItems = async (items) => {
+        const updatedItems = await Promise.all(
+          items.map(async (item) => {
+            console.log("BOBBY: ", item.itemName);
+            const imageUrl = await fetchUnsplashImage(item.itemName);
+            return {
+              ...item,
+              imageUrl,
+            };
+          })
+        );
+        setItems(updatedItems); // update your state
     };
 
-    const getRecipeTime = (input: any) => {
-        const recipe = RecipeData.find((recipe: { id: any; }) => recipe.id === input);
-        return recipe ? recipe.time : null;
-    };
 
     const getCategories = () => {
         return ['Chinese', 'Vegetarian', 'American', 'Italian', 'Mexican'];
@@ -73,7 +96,7 @@ export default function ItemsScreen() {
     const categories = getCategories();
 
     useEffect(() => {
-        fetchItems();
+      fetchItems();
     }, []);
 
     return (
@@ -94,17 +117,16 @@ export default function ItemsScreen() {
             </ScrollView>
 
             <ScrollView contentContainerStyle={styles.gridContainer}>
-            {recipesForYou.map((recipeName, index) => {
-                const recipeImage = getRecipeData(recipeName);
-                const recipeTime = getRecipeTime(recipeName);
+            {items.map((item, index) => {
+                //const recipeImage = item.itemName;
 
                 return (
                 <Pressable key={index} style={styles.recipeCard}>
-                    {recipeImage && (
-                    <ImageBackground source={{ uri: recipeImage }} style={styles.recipeImageBackground}>
+                    {item.imageUrl && (
+                    <ImageBackground source={{ uri: item.imageUrl }} style={styles.recipeImageBackground}>
                         <View style={styles.recipeOverlay}>
-                        <Text style={styles.recipeText}>{recipeName}</Text>
-                        <Text style={styles.recipeText}>{recipeTime}</Text>
+                        <Text style={styles.recipeText}>{item.itemName}</Text>
+                        <Text style={styles.recipeText}>{item.quantity}</Text>
                         </View>
                     </ImageBackground>
                     )}
@@ -112,7 +134,8 @@ export default function ItemsScreen() {
                 );
             })}
             </ScrollView>
-            </ScrollView>
+          </ScrollView>
+          <Popup style={{ position: "absolute", bottom: 60, alignSelf: 'flex-end', right: 20}} />
         </SafeAreaView>
     )
 }
@@ -176,6 +199,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         paddingBottom: 20,
+        marginRight: 30,
       },
       
       recipeCard: {
@@ -193,8 +217,9 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         height: 40,
-        justifyContent: 'center',
+        justifyContent: 'space-evenly',
         flexDirection: 'row',
+        
       },
       
 });

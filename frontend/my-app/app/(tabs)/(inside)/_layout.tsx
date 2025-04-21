@@ -44,6 +44,7 @@ export default function TabLayout() {
         tabBarIcon: ({ color }) => (
             <FontAwesome name="Profile" size={24} color={color} />
         ),
+        tabBarButton: () => null,
         }}
     />
     </Tabs>
