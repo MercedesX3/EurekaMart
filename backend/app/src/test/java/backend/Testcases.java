@@ -2,6 +2,9 @@ package backend;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Testcases {
 
     // log out - User.logout()
@@ -26,7 +29,7 @@ public class Testcases {
     {
         Inventory inventory = new Inventory();
         InventoryManager manager = new InventoryManager(inventory);
-        assertEquals("Success. Item added to inventory.", manager.addNewItem("Bread", 1, "bread.jpg"));
+        assertEquals("Success. Item added to inventory.", manager.addNewItem("Bread", 1));
     }
 
     @Test
@@ -34,7 +37,7 @@ public class Testcases {
     {
         Inventory inventory = new Inventory();
         InventoryManager manager = new InventoryManager(inventory);
-        assertEquals("Error. Item name cannot be empty.", manager.addNewItem(null, 1, "bread.jpg"));
+        assertEquals("Error. Item name cannot be empty.", manager.addNewItem(null, 1));
     }
 
     @Test
@@ -42,23 +45,16 @@ public class Testcases {
     {
         Inventory inventory = new Inventory();
         InventoryManager manager = new InventoryManager(inventory);
-        assertEquals("Error. Item quantity must be greater than 0.", manager.addNewItem("Bread", 0, "bread.jpg"));
+        assertEquals("Error. Item quantity must be greater than 0.", manager.addNewItem("Bread", 0));
     }
 
-    @Test
-    void addItem_TC4() // image path empty, fail
-    {
-        Inventory inventory = new Inventory();
-        InventoryManager manager = new InventoryManager(inventory);
-        assertEquals("Error. Image path cannot be empty.", manager.addNewItem("Bread", 1, ""));
-    }
 
     @Test
     void addItem_TC5() // quantity negative, fail
     {
         Inventory inventory = new Inventory();
         InventoryManager manager = new InventoryManager(inventory);
-        assertEquals("Error. Item quantity must be greater than 0.", manager.addNewItem("Bread", -3, null));
+        assertEquals("Error. Item quantity must be greater than 0.", manager.addNewItem("Bread", -3));
     }
 
     @Test
@@ -66,7 +62,7 @@ public class Testcases {
     {
         Inventory inventory = new Inventory(); // name is empty string, fail
         InventoryManager manager = new InventoryManager(inventory);
-        assertEquals("Error. Item name cannot be empty.", manager.addNewItem("", 1, "bread.jpg"));
+        assertEquals("Error. Item name cannot be empty.", manager.addNewItem("", 1));
     }
 
     @Test
@@ -74,39 +70,27 @@ public class Testcases {
     {
         Inventory inventory = new Inventory();
         InventoryManager manager = new InventoryManager(inventory);
-        assertEquals("Error. Item name cannot be empty.", manager.addNewItem(" ", 1, "bread.jpg"));
-    }
-
-    @Test
-    void addItem_TC8() // image path is null, fail
-    {
-        Inventory inventory = new Inventory();
-        InventoryManager manager = new InventoryManager(inventory);
-        assertEquals("Error. Image path cannot be empty.", manager.addNewItem("Bread", 1, null));
+        assertEquals("Error. Item name cannot be empty.", manager.addNewItem(" ", 1));
     }
 
 
 
+ // search recipe - RecipeManager.searchRecipe(Str itemName)
+@Test
+void searchRecipe_TC1_validItem() {
+    assertEquals("Recipe found: Chicken Tortilla", RecipeManager.searchRecipe("Chicken Tortilla"));
+}
 
+@Test
+void searchRecipe_TC2_nonExistingItem() {
+    assertEquals("Item not found.", RecipeManager.searchRecipe("Dragonfruit"));
+}
 
-    // search recipe - User.searchRecipe(Str itemName)
-    @Test
-    void searchRecipe_TC1_validItem() // existing item, success
-    {
-        assertEquals("Recipe found: Chicken Tortilla", User.searchRecipe("Chicken Tortilla"));
-    }
+@Test
+void searchRecipe_TC3_emptyInput() {
+    assertEquals("Item name cannot be empty.", RecipeManager.searchRecipe(""));
+}
 
-    @Test
-    void searchRecipe_TC2_nonExistingItem() // non-existing item, fail
-    {
-        assertEquals("Item not found.", User.searchRecipe("Dragonfruit"));
-    }
-
-    @Test
-    void searchRecipe_TC3_emptyInput() // empty input, fail
-    {
-        assertEquals("Item name cannot be empty.", User.searchRecipe(""));
-    }
 
 
 
@@ -138,7 +122,7 @@ public class Testcases {
     void login_TC4_passwordWrongCapitalization() // invalid password capialization, fail
     {
         User user = new User("josh", "password123");
-        assertEquals("Fail: Invalid username or password\n", user.login("josh", "Password123"));
+        assertEquals("Invalid username or password\n", user.login("josh", "Password123"));
     }
 
     @Test
@@ -160,5 +144,54 @@ public class Testcases {
     {
         User user = new User("josh", "password123");
         assertEquals("Username and password cannot be empty\n", user.login("", ""));
+    }
+
+
+
+    //Recommendation system
+        @Test
+    void testRecommendationEngine() {
+        Inventory inventory = new Inventory();
+        inventory.addItem(new Item("milk", 2));
+        inventory.addItem(new Item("eggs", 4));
+
+        List<Item> ingredients1 = List.of(new Item("milk", 2), new Item("eggs", 2));
+        List<Item> ingredients2 = List.of(new Item("milk", 3));
+        List<Recipe> allRecipes = new ArrayList<>();
+        allRecipes.add(new Recipe("Omelette", ingredients1, "", "", 0, List.of()));
+        allRecipes.add(new Recipe("Milkshake", ingredients2, "", "", 0, List.of()));
+
+        List<Recipe> recommended = RecommendationEngine.recommendRecipes(inventory, allRecipes);
+        assertEquals(1, recommended.size());
+        assertEquals("Omelette", recommended.get(0).getName());
+    }
+
+
+    //filter system
+    @Test
+    void testFilterByTags() {
+        List<Recipe> recipes = new ArrayList<>();
+
+        recipes.add(new Recipe("A", List.of(), "", "", 0, List.of("vegetarian", "breakfast")));
+        recipes.add(new Recipe("B", List.of(), "", "", 0,  List.of("dinner")));
+        recipes.add(new Recipe("C", List.of(), "", "", 0, List.of("vegetarian")));
+
+        List<Recipe> filtered = FilterSystem.filterByTags(recipes, List.of("vegetarian"));
+        assertEquals(2, filtered.size());
+
+        filtered = FilterSystem.filterByTags(recipes, List.of("vegetarian", "breakfast"));
+        assertEquals(1, filtered.size());
+    }
+
+    @Test
+    void testFilterByMaxPrepTime() {
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe("Fast", List.of(), "", "", 10, List.of()));
+        recipes.add(new Recipe("Medium", List.of(), "", "", 30, List.of()));
+        recipes.add(new Recipe("Slow", List.of(), "", "", 60, List.of()));
+
+        List<Recipe> filtered = FilterSystem.filterByMaxPrepTime(recipes, 20);
+        assertEquals(1, filtered.size());
+        assertEquals("Fast", filtered.get(0).getName());
     }
 }

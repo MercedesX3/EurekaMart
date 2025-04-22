@@ -1,63 +1,72 @@
 package backend;
-import java.util.List;
 
 public class User {
-    private final String username;
-    private final String password;
-    private boolean isLoggedIn;
+    private String id; // For MongoDB
+    private String username;
+    private String password;
+    private boolean loggedIn;
+    private Inventory inventory;
+
+    public User() {
+        // Default constructor for deserialization
+    }
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.isLoggedIn = false;
+        this.loggedIn = false;
+        this.inventory = new Inventory();
     }
 
+    // Login logic
     public String login(String usernameInput, String passwordInput) {
-        if (usernameInput.isEmpty() && passwordInput.isEmpty()) {
-            return "Username and password cannot be empty\n";
-        }
-        if (usernameInput.isEmpty()) {
-            return "Username cannot be empty\n";
-        }
-        if (passwordInput.isEmpty()) {
-            return "Password cannot be empty\n";
-        }
-        if (usernameInput.equalsIgnoreCase(username) && passwordInput.equals(password)) {
-            isLoggedIn = true;
-            return "Success: Redirected to home page\n";
-        }
-        if (usernameInput.equalsIgnoreCase(username) && passwordInput.equalsIgnoreCase(password)) {
-            return "Fail: Invalid username or password\n";
-        }
-        return "Invalid username or password\n";
-    }
-    
+        if (usernameInput == null || passwordInput == null) return "Username and password cannot be empty\n";
 
+        if (usernameInput.isEmpty() && passwordInput.isEmpty()) return "Username and password cannot be empty\n";
+        if (usernameInput.isEmpty()) return "Username cannot be empty\n";
+        if (passwordInput.isEmpty()) return "Password cannot be empty\n";
+
+        if (!this.username.equals(usernameInput) || !this.password.equals(passwordInput)) {
+            return "Invalid username or password\n";
+        }
+
+        this.loggedIn = true;
+        return "Success: Redirected to home page\n";
+    }
+
+    // Logout logic
     public String logout() {
-        if (isLoggedIn) {
-            return "You are logged in\n";
-        }
-        return "Something went wrong\n";
+        if (!loggedIn) return "Something went wrong\n";
+
+        loggedIn = false;
+        return "You are logged in\n";
     }
 
-    public static String searchRecipe(String itemName) {
-    if (itemName == null || itemName.trim().isEmpty()) {
-        return "Item name cannot be empty.";
+    // Search recipe (mock logic to match test cases)
+    public static String searchRecipe(String name) {
+        return RecipeManager.searchRecipe(name);
     }
 
-    List<String> availableRecipes = List.of(
-        "Chicken Tortilla",
-        "Chocolate Nutella",
-        "Pasta"
-    );
-
-    for (String recipe : availableRecipes) {
-        if (recipe.equalsIgnoreCase(itemName.trim())) {
-            return "Recipe found: " + recipe;
-        }
+    // Inventory access
+    public Inventory getInventory() {
+        return inventory;
     }
 
-    return "Item not found.";
-}
+    // ID field for MongoDB
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    // Optional: username and password getters (if needed elsewhere)
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }
