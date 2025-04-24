@@ -148,24 +148,93 @@ void searchRecipe_TC3_emptyInput() {
 
 
 
-    //Recommendation system
+    // Recommendation system
         @Test
-    void testRecommendationEngine() {
+    void testRecommendationEngine_TC1_validRecommendation() {
         Inventory inventory = new Inventory();
-        inventory.addItem(new Item("milk", 2));
-        inventory.addItem(new Item("eggs", 4));
+        inventory.addItem(new Item("spaghetti", 2));
+        inventory.addItem(new Item("tomato", 3));
 
-        List<Item> ingredients1 = List.of(new Item("milk", 2), new Item("eggs", 2));
-        List<Item> ingredients2 = List.of(new Item("milk", 3));
+        List<Item> ingredients1 = List.of(new Item("spaghetti", 2), new Item("tomato", 2));;
         List<Recipe> allRecipes = new ArrayList<>();
-        allRecipes.add(new Recipe("Omelette", ingredients1, "", "", 0, List.of()));
-        allRecipes.add(new Recipe("Milkshake", ingredients2, "", "", 0, List.of()));
+        allRecipes.add(new Recipe("Spaghetti with Tomato Sauce", ingredients1, "", "", 0, List.of()));
 
         List<Recipe> recommended = RecommendationEngine.recommendRecipes(inventory, allRecipes);
         assertEquals(1, recommended.size());
-        assertEquals("Omelette", recommended.get(0).getName());
+        assertEquals("Spaghetti with Tomato Sauce", recommended.get(0).getName()); // Spaghetti recipe, inventory has enough ingredients
     }
 
+        @Test
+    void testRecommendationEngine_TC2_noMatchingRecipe() {
+        Inventory inventory = new Inventory();
+        inventory.addItem(new Item("spaghetti", 1));
+        inventory.addItem(new Item("tomato", 1));
+    
+        List<Item> ingredients1 = List.of(new Item("spaghetti", 2), new Item("tomato", 2));
+        List<Item> ingredients2 = List.of(new Item("white rice", 1));
+        List<Recipe> allRecipes = new ArrayList<>();
+        allRecipes.add(new Recipe("Spaghetti with Tomato Sauce", ingredients1, "", "", 0, List.of()));
+        allRecipes.add(new Recipe("White Rice", ingredients2, "", "", 0, List.of()));
+    
+        List<Recipe> recommended = RecommendationEngine.recommendRecipes(inventory, allRecipes);
+        assertEquals(0, recommended.size());
+        // Not enough ingredients, no recipes found
+    }
+
+        @Test
+    void testRecommendationEngine_TC3_multipleRecipes() {
+        Inventory inventory = new Inventory();
+        inventory.addItem(new Item("spaghetti", 3));
+        inventory.addItem(new Item("tomato", 3));
+        inventory.addItem(new Item("garlic", 2));
+
+        List<Item> ingredients1 = List.of(new Item("spaghetti", 2), new Item("tomato", 2));
+        List<Item> ingredients2 = List.of(new Item("spaghetti", 3), new Item("tomato", 1));
+        List<Item> ingredients3 = List.of(new Item("tomato", 3), new Item("garlic", 1));
+        List<Recipe> allRecipes = new ArrayList<>();
+        allRecipes.add(new Recipe("Spaghetti with Tomato Sauce", ingredients1, "", "", 0, List.of()));
+        allRecipes.add(new Recipe("Tomato Soup", ingredients2, "", "", 0, List.of()));
+        allRecipes.add(new Recipe("Garlic Tomato Pasta", ingredients3, "", "", 0, List.of()));
+
+        List<Recipe> recommended = RecommendationEngine.recommendRecipes(inventory, allRecipes);
+        assertEquals(2, recommended.size());
+        assertEquals("Spaghetti with Tomato Sauce", recommended.get(0).getName());
+        assertEquals("Garlic Tomato Pasta", recommended.get(1).getName());
+        // Spaghetti and garlic pasta recipes, inventory matches both
+    }
+
+        @Test
+    void testRecommendationEngine_TC4_emptyInventory() {
+        Inventory inventory = new Inventory();
+
+        List<Item> ingredients1 = List.of(new Item("spaghetti", 2), new Item("tomato", 2));
+        List<Item> ingredients2 = List.of(new Item("chicken", 1), new Item("tomato", 1));
+        List<Recipe> allRecipes = new ArrayList<>();
+        allRecipes.add(new Recipe("Spaghetti with Tomato Sauce", ingredients1, "", "", 0, List.of()));
+        allRecipes.add(new Recipe("Chicken Soup", ingredients2, "", "", 0, List.of()));
+
+        List<Recipe> recommended = RecommendationEngine.recommendRecipes(inventory, allRecipes);
+        assertEquals(0, recommended.size());
+        // No ingredients in inventory, no recipes found
+    }
+
+        @Test
+    void testRecommendationEngine_TC5_nullIngredientException() {
+        Inventory inventory = null;
+        List<Item> ingredients1 = List.of(new Item("spaghetti", 2), new Item("tomato", 2));
+        List<Item> ingredients2 = List.of(new Item("spaghetti", 3), new Item("tomato", 1));
+        List<Recipe> allRecipes = new ArrayList<>();
+        allRecipes.add(new Recipe("Spaghetti with Tomato Sauce", ingredients1, "", "", 0, List.of()));
+        allRecipes.add(new Recipe("Tomato Soup", ingredients2, "", "", 0, List.of()));
+
+        try {
+            List<Recipe> recommended = RecommendationEngine.recommendRecipes(inventory, allRecipes);
+            fail("An exception should be thrown because the inventory is null.");
+        } catch (NullPointerException e) {
+            assertEquals("Inventory has not been created", e.getMessage());
+            // Exception handled, test passes
+        }
+    }
 
     //filter system
     @Test
