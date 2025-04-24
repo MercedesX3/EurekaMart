@@ -10,3 +10,5 @@ server/node_modules
 # setting up server
 cd server
 npm i express
+
+*.class
