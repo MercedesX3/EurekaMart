@@ -138,7 +138,11 @@ app.post("/add-item", async (req, res) => {
 });
 
 app.post("/get-recipe", async (req, res) => {
-    const ingredients = "apples,flour,sugar"; // TEMP: hardcoded for testing
+    console.log("💥 /get-recipe HIT");
+    const items = req.body.items || [];
+    console.log("✅ Received items from frontend:", items);
+    const ingredients = items.map(item => item.itemName).join(",");
+    console.log("🧠 Ingredients being sent to Spoonacular:", ingredients);
 
     try {
         const response = await axios.get(

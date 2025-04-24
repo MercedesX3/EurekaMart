@@ -58,39 +58,41 @@ export default function HomeScreen() {
         }
     };
 
-    const fetchItems = async () => { 
+    const fetchItems = async () => {
         const token = await AsyncStorage.getItem('token');
         try {
           const response = await axios.post("http://127.0.0.1:5001/get-item", {}, {
-            headers: {
-              Authorization: token,
-            },
+            headers: { Authorization: token },
           });
           setItems(response.data.name);
+          return response.data.name; // return for chaining
         } catch (error) {
-          console.error("Error fetching name:", error.response?.data || error.message);
+          console.error("Error fetching items:", error.response?.data || error.message);
+          return [];
         }
-    }
+      };
 
-    const fetchRecipes = async () => {
+      const fetchRecipes = async (items) => {
+        console.log("📦 Sending to backend /get-recipe:", items);  // ✅ ADD THIS LINE
+      
         try {
-            const response = await axios.post("http://127.0.0.1:5001/get-recipe", {items});
-            setRecipes(response.data);
-            console.log(response.data);
+          const response = await axios.post("http://127.0.0.1:5001/get-recipe", { items });
+          setRecipes(response.data);
+          console.log(response.data);
         } catch (error) {
-            console.log(error);
+          console.log(error);
         }
-    }
+      };
 
-    useEffect(() => {
+      useEffect(() => {
         const fetchAll = async () => {
-            await fetchName();
-            await fetchItems();
-            console.log(items);
-            await fetchRecipes();
-        }
+          await fetchName();
+          const realItems = await fetchItems();
+          console.log("Items being sent to get-recipe:", realItems);
+          await fetchRecipes(realItems);
+        };
         fetchAll();
-    }, []);
+      }, []);
 
     const getCategories = () => {
         return ['Chinese', 'Vegetarian', 'American', 'Italian', 'Mexican'];
