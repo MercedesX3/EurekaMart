@@ -102,7 +102,7 @@ export default function HomeScreen() {
         return ['Cheese Quesidilla', 'Sweet Mango Rice', "CheeseSteak"];
     }
 
-    const recipesForYou = getRecipesForYou();
+    const recipesForYou = recipes;
 
     const getRecipeData = (input: any) => {
         const recipe = RecipeData.find((recipe: { id: any; }) => recipe.id === input);
@@ -133,24 +133,19 @@ export default function HomeScreen() {
 
             <Text style={styles.recipesText}>Recipes for you</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
-                {recipesForYou.map((recipeName, index) => {
-                    const recipeImage = getRecipeData(recipeName);
-                    const recipeTime = getRecipeTime(recipeName);
-                    return (
-                        <Pressable key={index} style={[styles.categoryButton, {width: 225,
-                            height: 134, overflow: 'hidden',}]}>
-                            {/* Add ImageBackground and Text inside it */}
-                            {recipeImage && (
-                                <ImageBackground source={{ uri: recipeImage }} style={styles.recipeImageBackground}>
-                                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row'}}>
-                                        <Text style={styles.recipeText}>{recipeName}</Text>
-                                        <Text style={styles.recipeText}>{recipeTime}</Text>
-                                    </View>
-                                </ImageBackground>
-                            )}
-                        </Pressable>
-                    );
-                })}
+            {recipesForYou.map((recipe, index) => (
+    <Pressable key={index} style={[styles.categoryButton, { width: 225, height: 134, overflow: 'hidden' }]}>
+        {recipe.image && (
+            <ImageBackground source={{ uri: recipe.image }} style={styles.recipeImageBackground}>
+                <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row' }}>
+                    <Text style={styles.recipeText}>{recipe.title}</Text>
+                    <Text style={styles.recipeText}>{recipe.usedIngredientCount} used</Text>
+                </View>
+            </ImageBackground>
+        )}
+    </Pressable>
+))}
+
             </ScrollView>
 
             <Text>Popular recipes</Text>

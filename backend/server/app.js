@@ -137,27 +137,36 @@ app.post("/add-item", async (req, res) => {
     }
 });
 
-app.post("/get-recipe", async(req, res) => {
-    const items = req.body.items;
-    // const ingredients = items.map(item => item.itemName).join(",");
-    const ingredients = "apples,flour,sugar";
-    console.log("DAVE");
+app.post("/get-recipe", async (req, res) => {
+    const ingredients = "apples,flour,sugar"; // TEMP: hardcoded for testing
+
     try {
         const response = await axios.get(
-        `https://api.spoonacular.com/recipes/findByIngredients`,
-        {
-            params: {
-            ingredients,
-            number: 5,
-            apiKey: SPOONACULAR_API_KEY,
-            },
-        }
-        )
-        console.log(response);
+            "https://api.spoonacular.com/recipes/findByIngredients",
+            {
+                params: {
+                    ingredients,
+                    number: 5,
+                    apiKey: SPOONACULAR_API_KEY,
+                },
+            }
+        );
+
+        const recipes = response.data.map(r => ({
+            id: r.id,
+            title: r.title,
+            image: r.image,
+            usedIngredientCount: r.usedIngredientCount,
+            missedIngredientCount: r.missedIngredientCount
+        }));
+
+        res.status(200).json(recipes);
     } catch (err) {
-        console.error(err);
+        console.error("Error fetching recipes:", err.message);
+        res.status(500).json({ error: "Failed to fetch recipes" });
     }
 });
+
 
 app.listen(5001,()=> {
     console.log("Node js server started");
