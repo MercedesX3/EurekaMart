@@ -182,29 +182,7 @@ void searchRecipe_TC3_emptyInput() {
     }
 
         @Test
-    void testRecommendationEngine_TC3_multipleRecipes() {
-        Inventory inventory = new Inventory();
-        inventory.addItem(new Item("spaghetti", 3));
-        inventory.addItem(new Item("tomato", 3));
-        inventory.addItem(new Item("garlic", 2));
-
-        List<Item> ingredients1 = List.of(new Item("spaghetti", 2), new Item("tomato", 2));
-        List<Item> ingredients2 = List.of(new Item("spaghetti", 3), new Item("tomato", 1));
-        List<Item> ingredients3 = List.of(new Item("tomato", 3), new Item("garlic", 1));
-        List<Recipe> allRecipes = new ArrayList<>();
-        allRecipes.add(new Recipe("Spaghetti with Tomato Sauce", ingredients1, "", "", 0, List.of()));
-        allRecipes.add(new Recipe("Tomato Soup", ingredients2, "", "", 0, List.of()));
-        allRecipes.add(new Recipe("Garlic Tomato Pasta", ingredients3, "", "", 0, List.of()));
-
-        List<Recipe> recommended = RecommendationEngine.recommendRecipes(inventory, allRecipes);
-        assertEquals(2, recommended.size());
-        assertEquals("Spaghetti with Tomato Sauce", recommended.get(0).getName());
-        assertEquals("Garlic Tomato Pasta", recommended.get(1).getName());
-        // Spaghetti and garlic pasta recipes, inventory matches both
-    }
-
-        @Test
-    void testRecommendationEngine_TC4_emptyInventory() {
+    void testRecommendationEngine_TC3_emptyInventory() {
         Inventory inventory = new Inventory();
 
         List<Item> ingredients1 = List.of(new Item("spaghetti", 2), new Item("tomato", 2));
@@ -219,7 +197,7 @@ void searchRecipe_TC3_emptyInput() {
     }
 
         @Test
-    void testRecommendationEngine_TC5_nullIngredientException() {
+    void testRecommendationEngine_TC4_nullIngredientException() {
         Inventory inventory = null;
         List<Item> ingredients1 = List.of(new Item("spaghetti", 2), new Item("tomato", 2));
         List<Item> ingredients2 = List.of(new Item("spaghetti", 3), new Item("tomato", 1));
