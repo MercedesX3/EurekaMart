@@ -14,6 +14,9 @@ public class FilterSystem {
     validTags.add("Gluten-Free");
     validTags.add("Vegan");
     validTags.add("Vegetarian");
+    validTags.add("Breakfast");
+    validTags.add("Lunch");
+    validTags.add("Dinner");
 
     //arrlist that holds the dummy data
     List<Recipe> testRecipeList = new ArrayList<>();
@@ -30,7 +33,7 @@ public class FilterSystem {
     Item salt = new Item("Salt", 0.5);
     Item eggs = new Item("Eggs", 2);
     Item milk = new Item("Milk", 1);
-    Item butter = new Item("Butter", 0.5;)
+    Item butter = new Item("Butter", 0.5);
 
     chocCakeIngrList.add (flour, sugar, cocoaPowder, bakingSoda, salt, eggs, milk, butter);
 
@@ -145,8 +148,8 @@ public class FilterSystem {
     enchiladasIngrList.add(vegetableOil, onion, garlic3, chilePowder, cumin, cayennePepper, tomatoPuree, spinach, 
     cheddar, pepperJack, sourCream, scallion, salt, tortilla, limeJuice);
 
-    String enchiladasInstr = "Heat 1 tbsp vegetable oil in a pan. Sauté 1 chopped onion and 3 minced garlic cloves for 2–3 minutes. Add 1 tbsp chili powder, 1 tsp cumin, a pinch of cayenne, and ½ tsp salt. Cook 1 minute. Stir in 1 cup tomato puree and juice of ½ lime. Simmer for 5 minutes. In another pan, sauté 2 cups spinach until wilted.Mix spinach with ½ cup shredded cheddar and ½ cup shredded pepper jack.
-        Fill 6–8 tortillas with the mixture. Roll and place in a baking dish. Pour sauce over enchiladas. Top with more cheese if desired. Bake at 375°F (190°C) for 15–20 minutes. Top with sliced scallions and sour cream before serving.";
+    String enchiladasInstr = """Heat 1 tbsp vegetable oil in a pan. Sauté 1 chopped onion and 3 minced garlic cloves for 2–3 minutes. Add 1 tbsp chili powder, 1 tsp cumin, a pinch of cayenne, and ½ tsp salt. Cook 1 minute. Stir in 1 cup tomato puree and juice of ½ lime. Simmer for 5 minutes. In another pan, sauté 2 cups spinach until wilted.Mix spinach with ½ cup shredded cheddar and ½ cup shredded pepper jack.
+        Fill 6–8 tortillas with the mixture. Roll and place in a baking dish. Pour sauce over enchiladas. Top with more cheese if desired. Bake at 375°F (190°C) for 15–20 minutes. Top with sliced scallions and sour cream before serving.""";
 
     String enchiladasImgURL = "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2015/11/6/1/FNK_Vegetarian-Enchiladas_s4x3.jpg.rend.hgtvcom.826.620.suffix/1447277610191.webp";
 
@@ -159,8 +162,9 @@ public class FilterSystem {
     }*/
     
 
-    public static List<Recipe> filterByTags(List<Recipe> recipes, List<String> requiredTags, List<String> validTags) {
+    public static List<Recipe> filterByTags(List<Recipe> recipes, List<String> requiredTags) {
 
+        List
         for (Recipe recipe : recipes) {
             if (recipe.getTags() != null && recipe.getTags().containsAll(requiredTags)) { //if tags are not null and the recipe has all required tags...
                 filtered.add(recipe); //then add the recipe 
@@ -177,7 +181,7 @@ public class FilterSystem {
             {
                 System.out.println("Please enter a recipe."); //TC recipe is null
             }
-            else if (recipe == "")
+            else if (recipe.equals(""))
             {
                 System.out.println("Please enter a valid recipe."); //TC recipe is empty str
             }            
