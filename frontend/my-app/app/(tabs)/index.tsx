@@ -32,9 +32,10 @@ export default function TabOneScreen() {
     Inter_900Black,
   });
 
+
   return (
     <View style={styles.container}>
-      <Reshot width={289} height={184} style={{top: 20}}/>
+      <Reshot width={289} height={184} style={{top: -10}}/>
       <View style={styles.textContainer}>
         <Text style={styles.title}>Welcome to</Text>
         <Text style={styles.title}>Eureka Mart</Text>
@@ -46,7 +47,7 @@ export default function TabOneScreen() {
       </Pressable>
       <View style={styles.accountExistContainer}>
         <Text style={{fontSize: 15, fontFamily: "Inter_600SemiBold"}}>Already have an account? </Text>
-        <Pressable><Text style={{color: '#F9C784', fontSize: 15, fontFamily: "Inter_600SemiBold"}}>Login</Text></Pressable>
+        <Pressable><Text style={{color: '#F9C784', fontSize: 15, fontFamily: "Inter_700Bold"}}>Login</Text></Pressable>
       </View>
     </View>
   );
@@ -60,23 +61,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textContainer: {
-    top: 80,
+    top: 40,
     alignSelf: "center", // Allows the text to align left
     width: "80%", // Ensures the text has space to align within
   },
   title: {
     fontSize: 40,
     fontFamily: "Inter_600SemiBold",
-    textAlign: "left"
+    textAlign: "center"
   },
   getStartedButton: {
-    top: 130,
+    top: 100,
     backgroundColor: '#588981',
     height: 49,
     width: 220,
     borderRadius: 50,
-    alignSelf: 'flex-start',
-    marginLeft: '10%',
+    //alignSelf: 'flex-start',
+    
+    //marginTop: '30',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -88,8 +90,8 @@ const styles = StyleSheet.create({
   accountExistContainer: {
     flexDirection: 'row',
     top: 160,
-    alignSelf: 'flex-start',
-    marginLeft: '10%',
+    //alignSelf: 'flex-start',
+    //marginLeft: '10%',
   },
   separator: {
     marginVertical: 30,

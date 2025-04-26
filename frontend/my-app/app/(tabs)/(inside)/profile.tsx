@@ -50,24 +50,32 @@ export default function ProfileScreen() {
           console.error("Error fetching name:", error.response?.data || error.message);
         }
     };
-
+    
     const fetchNumberOfItems = async () => {
-        const token = await AsyncStorage.getItem('token');
-        try {
-            const response = await axios.post("http://127.0.0.1:5001/get-item", {}, {
-                headers: {
-                  Authorization: token,
-                },
-              });
-
-            let number = 0;
-            for(let i = 0; i < response.data.name.length; i++) {
-                number += Number(response.data.name[i].quantity);
+      const token = await AsyncStorage.getItem('token');
+      try {
+        const response = await axios.post("http://127.0.0.1:5001/get-item", {}, {
+          headers: {
+            Authorization: token,
+          },
+        });
+    
+        let number = 0;
+        const items = response.data.name;
+    
+        if (Array.isArray(items)) {
+          for (let i = 0; i < items.length; i++) {
+            const qty = items[i].quantity;
+            if (typeof qty === 'number' && !isNaN(qty)) {
+              number += qty;
             }
-            setNumberItems(number);
-        } catch (error) {
-            console.error("Error fetching quantity:", error.response?.data || error.message);
+          }
         }
+    
+        setNumberItems(number);
+      } catch (error) {
+        console.error("Error fetching quantity:", error.response?.data || error.message);
+      }
     }
 
     const handleSignOut = async () => {
