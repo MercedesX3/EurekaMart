@@ -7,7 +7,9 @@ const UserDetailSchema = new mongoose.Schema({
     items: [{
         itemName: String,
         quantity: Number,
-    },]
+    },],
+    diet: [String],
+    intolerances: [String],
 }, {
     collection: "UserInfo"
 });

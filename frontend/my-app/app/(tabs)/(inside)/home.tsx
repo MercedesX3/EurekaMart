@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Text, View } from '@/components/Themed';
 import RecipeData from '@/assets/data/recipe.json';
 import Popup from '@/components/popup';
+import SearchBar from '@/components/searchbar';
 
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -78,7 +79,6 @@ export default function HomeScreen() {
         try {
           const response = await axios.post("http://127.0.0.1:5001/get-recipe", { items });
           setRecipes(response.data);
-          console.log(response.data);
         } catch (error) {
           console.log(error);
         }
@@ -122,6 +122,7 @@ export default function HomeScreen() {
             <Pressable onPress={() => {navigation.navigate('profile')}} style={styles.profileCircle}/>
             <Text style={styles.profileNameText}>Hello {name || '...'}</Text>
             <Text style={{color: 'rgba(88, 137, 129, 0.57)', fontSize: 20, fontFamily: "Inter_600SemiBold"}}>Let's start cooking</Text>
+            <SearchBar/>
 
             {/* categories */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
@@ -150,7 +151,7 @@ export default function HomeScreen() {
 
             </ScrollView>
 
-            <Text>Popular recipes</Text>
+            <Text style={styles.recipesText}>Popular recipes</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
                 {recipesForYou.map((recipeName, index) => {
                     const recipeImage = getRecipeData(recipeName);
@@ -172,7 +173,7 @@ export default function HomeScreen() {
                 })}
             </ScrollView>
 
-            <Text>Breakfast</Text>
+            <Text style={styles.recipesText}>Breakfast</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
                 {recipesForYou.map((recipeName, index) => {
                     const recipeImage = getRecipeData(recipeName);
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
     recipesText: {
         fontFamily: "Inter_600SemiBold",
         fontSize: 24,
-        marginBottom: 10,
+        marginBottom: 0,
     },
     recipeImageBackground: {
         flex: 1,
