@@ -46,8 +46,9 @@ export default function HomeScreen() {
     const [recipes, setRecipes] = useState([]);
     const [breakfast, setBreakfast] = useState([]);
     const [mainCourse, setMainCourse] = useState([]);
-    const [sideDish, setSideDish] = useState([]);
-
+    const [searchedRecipes, setSearchedRecipes] = useState([]);
+    const [searchButtonStatus, setSearchButtonStatus] = useState(false);
+    const [searchedText, setSearchText] = useState("");
 
     const fetchName = async () => {
         const token = await AsyncStorage.getItem('token');
@@ -99,14 +100,24 @@ export default function HomeScreen() {
                 setBreakfast(response.data.results);
                 console.log(response.data, "BREAKFAST");
             }
-            else if (type == "main course") {
-                setMainCourse(response.data.results);
-            }
             else {
-                setSideDish(response.data.results);
+                setMainCourse(response.data.results);
             }
         } catch (error) {
             console.log(error, "there was an error with fetch category");
+        }
+      }
+
+      const searchItem = async (search) => {
+        try {
+            const response = await axios.post("http://127.0.0.1:5001/get-search", {search}, {
+                headers: {"Content-Type": "application/json"},
+            });
+            console.log(search);
+            console.log("BOBBY: ", response.data.results);
+            setSearchedRecipes(response.data.results);
+        } catch (error) {
+            console.log(error, "There was an error with search Item");
         }
       }
 
@@ -136,15 +147,11 @@ export default function HomeScreen() {
 
     const recipesForYou = recipes;
 
-    const getRecipeData = (input: any) => {
-        const recipe = RecipeData.find((recipe: { id: any; }) => recipe.id === input);
-        return recipe ? recipe.photoURL : null;
-    };
-
-    const getRecipeTime = (input: any) => {
-        const recipe = RecipeData.find((recipe: { id: any; }) => recipe.id === input);
-        return recipe ? recipe.time : null;
-    };
+    const clickedSearchButton = () => {
+        setSearchButtonStatus(!searchButtonStatus);
+        console.log("Searching for ", searchedText);
+        searchItem(searchedText);
+    }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -152,7 +159,7 @@ export default function HomeScreen() {
             <Pressable onPress={() => {navigation.navigate('profile')}} style={styles.profileCircle}/>
             <Text style={styles.profileNameText}>Hello {name || '...'}</Text>
             <Text style={{color: 'rgba(88, 137, 129, 0.57)', fontSize: 20, fontFamily: "Inter_600SemiBold"}}>Let's start cooking</Text>
-            <SearchBar/>
+            <SearchBar searchText={searchedText} setSearchText={setSearchText} onSubmit={()=>clickedSearchButton()}/>
 
             {/* categories */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
@@ -164,6 +171,9 @@ export default function HomeScreen() {
                 ))}
             </ScrollView>
 
+            { !searchButtonStatus && (
+                <>
+
             <Text style={styles.recipesText}>Recipes for you</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
             {recipesForYou.map((recipe, index) => (
@@ -172,7 +182,6 @@ export default function HomeScreen() {
                     <ImageBackground source={{ uri: recipe.image }} style={styles.recipeImageBackground}>
                         <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row' }}>
                             <Text style={styles.recipeText}>{recipe.title}</Text>
-                            <Text style={styles.recipeText}>{recipe.usedIngredientCount} used</Text>
                         </View>
                     </ImageBackground>
                 )}
@@ -204,13 +213,32 @@ export default function HomeScreen() {
                         <ImageBackground source={{ uri: recipe.image }} style={styles.recipeImageBackground}>
                             <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row' }}>
                                 <Text style={styles.recipeText}>{recipe.title}</Text>
-                                <Text style={styles.recipeText}>{recipe.usedIngredientCount} used</Text>
                             </View>
                         </ImageBackground>
                     )}
                 </Pressable>
                 ))}
             </ScrollView>
+            </>
+            )}
+
+            {searchButtonStatus && (
+                <>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
+                        {searchedRecipes.map((recipe, index) => (
+                            <Pressable key={index} style={[styles.categoryButton, { width: 225, height: 134, overflow: 'hidden' }]}>
+                                {recipe.image && (
+                                    <ImageBackground source={{ uri: recipe.image }} style={styles.recipeImageBackground}>
+                                        <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row' }}>
+                                            <Text style={styles.recipeText}>{recipe.title}</Text>
+                                        </View>
+                                    </ImageBackground>
+                                )}
+                            </Pressable>
+                        ))}
+                    </ScrollView>
+                </>
+            )}
 
             </ScrollView>
             <Popup style={{ position: "absolute", bottom: 60, alignSelf: 'flex-end', right: 20}} />

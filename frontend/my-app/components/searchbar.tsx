@@ -22,25 +22,28 @@ import {
 
 type PopupProps = {
   style?: ViewStyle | ViewStyle[];
+  searchText: string;
+  setSearchText: (text: string) => void;
+  onSubmit: () => void;
 };
 
-const SearchBar = ({ style }: PopupProps) => {
-    const [word, setWord] = useState("");
-
+const SearchBar: React.FC<PopupProps> = ({ searchText, setSearchText, onSubmit, style }) => {
     return (
-        <View style={styles.container}>
-            <Image source={SearchIcon} style={styles.image}/>
-            <TextInput
-            style={{marginLeft: 10}}
-            placeholder="Search..."
-            value={word}
-            onChangeText={setWord}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            />
-        </View>
-    )
-}
+      <View style={[styles.container, style]}>
+        <Image source={SearchIcon} style={styles.image} />
+        <TextInput
+          style={{marginLeft: 10}}
+          placeholder="Search..."
+          value={searchText}
+          onChangeText={setSearchText}
+          onSubmitEditing={onSubmit}
+          returnKeyType="search"
+          keyboardType="default"
+          autoCapitalize="none"
+        />
+      </View>
+    );
+  };
 
 export default SearchBar;
 

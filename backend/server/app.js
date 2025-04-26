@@ -185,6 +185,28 @@ app.post("/add-item", async (req, res) => {
     }
 });
 
+app.post("/get-search", async (req, res) => {
+    const title = req.body.type;
+
+    try {
+        const response = await axios.get(
+            "https://api.spoonacular.com/recipes/complexSearch",
+            {
+                params: {
+                    query: title,
+                    apiKey: SPOONACULAR_API_KEY,
+                    number: 5,
+                }
+            }
+        );
+
+        console.log(response, "Success with get-item: ");
+        res.json(response.data);
+    } catch (err) {
+        console.log(err, "Error with get-item")
+    }
+})
+
 app.post("/get-type", async (req, res) => {
     const mealType = req.body.type;
 

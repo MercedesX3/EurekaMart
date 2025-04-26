@@ -28,6 +28,10 @@ const UNSPLASH_API_KEY = "-iFsG8Woa6NJCA3P4XiZh-y26dNs2Wg4Czh0cELoAKk";
 export default function ItemsScreen() {
     const [items, setItems] = useState([]);
     const navigation = useNavigation();
+    const [searchedRecipes, setSearchedRecipes] = useState([]);
+    const [searchButtonStatus, setSearchButtonStatus] = useState(false);
+    const [searchedText, setSearchText] = useState("");
+
     let [fontsLoaded] = useFonts({
         Inter_100Thin,
         Inter_200ExtraLight,
@@ -97,9 +101,26 @@ export default function ItemsScreen() {
     
     const categories = getCategories();
 
+    const searchItem = async (itemName) => {
+      try {
+          const response = await axios.post("", {itemName}, {
+              headers: {"Content-Type": "application/json"},
+          });
+          setSearchedRecipes(response.data.results);
+      } catch (error) {
+          console.log(error, "There was an error with search Item");
+      }
+    }
+
     useEffect(() => {
       fetchItems();
     }, []);
+
+    const clickedSearchButton = () => {
+      setSearchButtonStatus(!searchButtonStatus);
+      console.log("Searching for ", searchedText);
+      searchItem(searchedText);
+  }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -108,7 +129,7 @@ export default function ItemsScreen() {
             <Pressable onPress={() => {navigation.navigate('profile')}} style={styles.profileCircle}/>
             <Text style={styles.profileNameText}>Your refrigerator</Text>
             <Text style={{color: 'rgba(88, 137, 129, 0.57)', fontSize: 20, fontFamily: "Inter_600SemiBold"}}>Let's see what you have!</Text>
-            <SearchBar/>
+            <SearchBar searchText={searchedText} setSearchText={setSearchText} onSubmit={()=>clickedSearchButton()}/>
             {/* categories */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
                 {categories.map((category, index) => (
