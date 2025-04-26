@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 
 public class Testcases {
@@ -215,30 +216,113 @@ void searchRecipe_TC3_emptyInput() {
     }
 
     //filter system
-    @Test
-    void testFilterByTags() {
+    @Test   // Filter recipes without the desired tags
+    void testFilterByTags_TC1() {
         List<Recipe> recipes = new ArrayList<>();
 
-        recipes.add(new Recipe("A", List.of(), "", "", 0, List.of("vegetarian", "breakfast")));
-        recipes.add(new Recipe("B", List.of(), "", "", 0,  List.of("dinner")));
-        recipes.add(new Recipe("C", List.of(), "", "", 0, List.of("vegetarian")));
+        recipes.add(new Recipe("A", List.of(), "", "", 10, List.of("Vegetarian", "Breakfast")));
+        recipes.add(new Recipe("B", List.of(), "", "", 30,  List.of("Dinner")));
+        recipes.add(new Recipe("C", List.of(), "", "", 60, List.of("Vegetarian")));
 
-        List<Recipe> filtered = FilterSystem.filterByTags(recipes, List.of("vegetarian"));
+        List<Recipe> filtered = FilterSystem.filterByTags(recipes, List.of("Vegetarian"));
         assertEquals(2, filtered.size());
 
-        filtered = FilterSystem.filterByTags(recipes, List.of("vegetarian", "breakfast"));
+        filtered = FilterSystem.filterByTags(recipes, List.of("Vegetarian", "Breakfast"));
         assertEquals(1, filtered.size());
     }
-
-    @Test
-    void testFilterByMaxPrepTime() {
+    @Test   // Filter by Max Prep Time
+    void testFilterByMaxPrepTime_TC2() {
         List<Recipe> recipes = new ArrayList<>();
-        recipes.add(new Recipe("Fast", List.of(), "", "", 10, List.of()));
-        recipes.add(new Recipe("Medium", List.of(), "", "", 30, List.of()));
-        recipes.add(new Recipe("Slow", List.of(), "", "", 60, List.of()));
+        recipes.add(new Recipe("Recipe A", List.of(), "", "", 10, List.of("Vegetarian", "Breakfast")));
+        recipes.add(new Recipe("Recipe B", List.of(), "", "", 30,  List.of("Dinner")));
+        recipes.add(new Recipe("Recipe C", List.of(), "", "", 60, List.of("Vegetarian")));
 
         List<Recipe> filtered = FilterSystem.filterByMaxPrepTime(recipes, 20);
         assertEquals(1, filtered.size());
-        assertEquals("Fast", filtered.get(0).getName());
+        assertEquals("Recipe A", filtered.get(0).getName());
+    }
+    
+
+    @Test
+    void testFilterByTags_TC3(){
+        List<Recipe> recipes = new ArrayList<>();
+        
+        List<Recipe> filtered = FilterSystem.filterByTags(recipes, List.of("Vegetarian"));
+            
+        
+        assertEquals(0, filtered.size());
+        // Recipe list is empty. reject this input
+    }
+    @Test
+    void testFilterByTags_TC4(){
+        List<Recipe> recipes = new ArrayList<>();
+        List<String> tags = null;
+        recipes.add(new Recipe("Recipe A", List.of(), "", "", 10, tags));
+        recipes.add(new Recipe("Recipe B", List.of(), "", "", 30,  List.of("Dinner")));
+        recipes.add(new Recipe("Recipe C", List.of(), "", "", 60, List.of("Vegetarian")));
+
+        try {
+            List<Recipe> filtered = FilterSystem.filterByTags(recipes, List.of("Vegetarian"));
+            fail("An exception should be thrown because the tags in Recipe A are null.");
+        } catch (NullPointerException e) {
+            assertEquals("Please input a valid list of recipes.", e.getMessage());
+            // Exception handled, test passes
+        }
+    }
+
+    @Test
+    void testFilterByTags_TC5(){
+        List<Recipe> recipes = new ArrayList<>();
+
+        recipes.add(new Recipe("A", List.of(), "", "", 10, List.of("Vegetarian", "Breakfast")));
+        recipes.add(new Recipe("B", List.of(), "", "", 30,  List.of("Dinner")));
+        recipes.add(new Recipe("C", List.of(), "", "", 60, List.of("Vegetarian")));
+
+        List<Recipe> filtered = FilterSystem.filterByTags(recipes, List.of("Yellow"));
+        assertEquals(0, filtered.size());
+    }
+
+    @Test
+    void testFilterByTags_TC6(){
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe("Recipe A", List.of(), "", "", 10, List.of("Vegetarian", "Breakfast")));
+        recipes.add(new Recipe("Recipe B", List.of(), "", "", 30,  List.of("Dinner")));
+        recipes.add(new Recipe("Recipe C", List.of(), "", "", 60, List.of("Vegetarian")));
+
+        try {
+            List<Recipe> filtered = FilterSystem.filterByTags(recipes, List.of(70));
+            fail("An exception should be thrown because the desired tag is not a string.");
+        } catch (InputMismatchException e) {
+            assertEquals("Please input a valid list of filter tags.", e.getMessage());
+            // Exception handled, test passes
+        }
+    }
+
+    @Test   // Filter by max prep time, but the integer is negative
+    void testFilterByMaxPrepTime_TC7() {
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe("Recipe A", List.of(), "", "", 10, List.of("Vegetarian", "Breakfast")));
+        recipes.add(new Recipe("Recipe B", List.of(), "", "", 30,  List.of("Dinner")));
+        recipes.add(new Recipe("Recipe C", List.of(), "", "", 60, List.of("Vegetarian")));
+
+        List<Recipe> filtered = FilterSystem.filterByMaxPrepTime(recipes, -20);
+        assertEquals(0, filtered.size());
+        //assertEquals("Recipe A", filtered.get(0).getName());
+    }
+
+    @Test   // Filter by Max Prep Time, but the max prep time is not an integer
+    void testFilterByMaxPrepTime_TC8() {
+        List<Recipe> recipes = new ArrayList<>();
+        recipes.add(new Recipe("Recipe A", List.of(), "", "", 10, List.of("Vegetarian", "Breakfast")));
+        recipes.add(new Recipe("Recipe B", List.of(), "", "", 30,  List.of("Dinner")));
+        recipes.add(new Recipe("Recipe C", List.of(), "", "", 60, List.of("Vegetarian")));
+
+        try {
+            List<Recipe> filtered = FilterSystem.filterByMaxPrepTime(recipes, "Twenty minutes");
+            fail("An exception should be thrown because the desired prep time is not an integer.");
+        } catch (InputMismatchException e) {
+            assertEquals("Please input a valid maximum prep time.", e.getMessage());
+            // Exception handled, test passes
+        }
     }
 }
