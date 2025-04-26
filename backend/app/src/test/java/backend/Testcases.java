@@ -257,7 +257,7 @@ void searchRecipe_TC3_emptyInput() {
     void testFilterByTags_TC4(){
         List<Recipe> recipes = new ArrayList<>();
         List<String> tags = null;
-        recipes.add(new Recipe("Recipe A", List.of(), "", "", 10, null));
+        recipes.add(new Recipe("Recipe A", List.of(), "", "", 10, tags));
         recipes.add(new Recipe("Recipe B", List.of(), "", "", 30,  List.of("Dinner")));
         recipes.add(new Recipe("Recipe C", List.of(), "", "", 60, List.of("Vegetarian")));
 

@@ -164,7 +164,7 @@ public class FilterSystem {
 
     public static List<Recipe> filterByTags(List<Recipe> recipes, List<String> requiredTags) {
 
-        List
+        
         for (Recipe recipe : recipes) {
             if (recipe.getTags() != null && recipe.getTags().containsAll(requiredTags)) { //if tags are not null and the recipe has all required tags...
                 filtered.add(recipe); //then add the recipe 
