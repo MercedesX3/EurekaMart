@@ -1,9 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, SafeAreaView} from 'react-native';
 import Colors from '@/constants/Colors';
 
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DropDown from '@/components/dropDown';
+import IntoleranceDropDown from '@/components/intolerancesDropDown';
 
 import {
     useFonts,
@@ -17,7 +19,6 @@ import {
     Inter_800ExtraBold,
     Inter_900Black,
   } from '@expo-google-fonts/inter';
-  import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 
 export default function ProfileScreen() {
@@ -50,24 +51,32 @@ export default function ProfileScreen() {
           console.error("Error fetching name:", error.response?.data || error.message);
         }
     };
-
+    
     const fetchNumberOfItems = async () => {
-        const token = await AsyncStorage.getItem('token');
-        try {
-            const response = await axios.post("http://127.0.0.1:5001/get-item", {}, {
-                headers: {
-                  Authorization: token,
-                },
-              });
-
-            let number = 0;
-            for(let i = 0; i < response.data.name.length; i++) {
-                number += Number(response.data.name[i].quantity);
+      const token = await AsyncStorage.getItem('token');
+      try {
+        const response = await axios.post("http://127.0.0.1:5001/get-item", {}, {
+          headers: {
+            Authorization: token,
+          },
+        });
+    
+        let number = 0;
+        const items = response.data.name;
+    
+        if (Array.isArray(items)) {
+          for (let i = 0; i < items.length; i++) {
+            const qty = items[i].quantity;
+            if (typeof qty === 'number' && !isNaN(qty)) {
+              number += qty;
             }
-            setNumberItems(number);
-        } catch (error) {
-            console.error("Error fetching quantity:", error.response?.data || error.message);
+          }
         }
+    
+        setNumberItems(number);
+      } catch (error) {
+        console.error("Error fetching quantity:", error.response?.data || error.message);
+      }
     }
 
     const handleSignOut = async () => {
@@ -91,6 +100,8 @@ export default function ProfileScreen() {
     }, []);
 
     return (
+      <SafeAreaView style={{paddingTop: 40, backgroundColor: 'white', flex: 1}}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
         <View style={styles.profilePicture}/>
         <Text style={styles.profileText}>{name}</Text>
@@ -98,12 +109,8 @@ export default function ProfileScreen() {
             <Text style={styles.totalItemsBoxText}>{numberItems}</Text>
             <Text style={[styles.totalItemsBoxText, {fontSize: 15}]}>Total Items</Text>
         </View>
-        <View style={styles.boxContainer}>
-            <Text style={styles.boxText}>Edit Profile</Text>
-        </View>
-        <View style={styles.boxContainer}>
-            <Text style={styles.boxText}>History</Text>
-        </View>
+        <DropDown/>
+        <IntoleranceDropDown/>
         <Pressable onPress={handleSignOut}>
             <View style={{
                 marginTop: 20,
@@ -118,6 +125,8 @@ export default function ProfileScreen() {
             </View>
         </Pressable>
         </View>
+        </ScrollView>
+        </SafeAreaView>
     );
 }
 
@@ -127,6 +136,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',  // Centers vertically
     alignItems: 'center',      // Centers horizontally
     backgroundColor: '#fff',
+    marginTop: 60,
   },
   text: {
     fontSize: 20,

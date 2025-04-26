@@ -114,6 +114,54 @@ app.post("/get-item", async (req, res) => {
     }
 })
 
+app.post("/set-diet", async (req, res) => {
+    const token = req.headers["authorization"];
+    console.log("Bobby");
+    try {
+        const decoded = jwt.verify(token, jwt_password);
+        const userId = decoded.id;
+
+        const newDiets = req.body.selectedDiets || [];
+        console.log(newDiets);
+
+        const result = await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: { diet: { $each: newDiets } } },
+            { new: true }
+        );
+
+        res.status(200).json({ message: "Diets added!", user: result });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ status: "error", message: "Could not add diets" });
+    }
+
+})
+
+app.post("/set-intolerances", async (req, res) => {
+    const token = req.headers["authorization"];
+    console.log("Adam");
+    try {
+        const decoded = jwt.verify(token, jwt_password);
+        const userId = decoded.id;
+
+        const newIntolerances = req.body.selectedIntolerances || [];
+        console.log(newIntolerances);
+
+        const result = await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: { intolerances: { $each: newIntolerances } } },
+            { new: true }
+        );
+
+        res.status(200).json({ message: "Intolerances added!", user: result });
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ status: "error", message: "Could not add diets" });
+    }
+
+})
+
 app.post("/add-item", async (req, res) => {
     const token = req.headers["authorization"];
 
@@ -126,7 +174,7 @@ app.post("/add-item", async (req, res) => {
 
         const result = await User.findByIdAndUpdate(
             userId,
-            { $push: { items: newItem } },
+            { $addToSet: { items: newItem } },
             { new: true }
         );
 
@@ -137,12 +185,34 @@ app.post("/add-item", async (req, res) => {
     }
 });
 
+app.post("/get-type", async (req, res) => {
+    const mealType = req.body.type;
+
+    try {
+        const response = await axios.get(
+            "https://api.spoonacular.com/recipes/complexSearch",
+            {
+                params: {
+                    type: mealType,
+                    apiKey: SPOONACULAR_API_KEY,
+                    number: 10,
+                }
+            }
+        );
+
+        console.log(response, "Success with get-type: ");
+        res.json(response.data);
+    } catch (err) {
+        console.log(err, "Error with get-type")
+    }
+})
+
 app.post("/get-recipe", async (req, res) => {
-    console.log("💥 /get-recipe HIT");
+    //console.log("💥 /get-recipe HIT");
     const items = req.body.items || [];
-    console.log("✅ Received items from frontend:", items);
+    //console.log("✅ Received items from frontend:", items);
     const ingredients = items.map(item => item.itemName).join(",");
-    console.log("🧠 Ingredients being sent to Spoonacular:", ingredients);
+    //console.log("🧠 Ingredients being sent to Spoonacular:", ingredients);
 
     try {
         const response = await axios.get(

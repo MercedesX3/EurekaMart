@@ -6,7 +6,9 @@ import { Text, View } from '@/components/Themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Popup from '@/components/popup';
+import { useNavigation } from '@react-navigation/native'; // to access profile page when in items section
 
+import SearchBar from '@/components/searchbar';
 import {
   useFonts,
   Inter_100Thin,
@@ -25,7 +27,7 @@ const UNSPLASH_API_KEY = "-iFsG8Woa6NJCA3P4XiZh-y26dNs2Wg4Czh0cELoAKk";
 
 export default function ItemsScreen() {
     const [items, setItems] = useState([]);
-
+    const navigation = useNavigation();
     let [fontsLoaded] = useFonts({
         Inter_100Thin,
         Inter_200ExtraLight,
@@ -102,10 +104,11 @@ export default function ItemsScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView showsVerticalScrollIndicator={false}>
-            <View style={styles.profileCircle}/>
+              
+            <Pressable onPress={() => {navigation.navigate('profile')}} style={styles.profileCircle}/>
             <Text style={styles.profileNameText}>Your refrigerator</Text>
             <Text style={{color: 'rgba(88, 137, 129, 0.57)', fontSize: 20, fontFamily: "Inter_600SemiBold"}}>Let's see what you have!</Text>
-
+            <SearchBar/>
             {/* categories */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
                 {categories.map((category, index) => (

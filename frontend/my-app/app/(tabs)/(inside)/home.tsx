@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Text, View } from '@/components/Themed';
 import RecipeData from '@/assets/data/recipe.json';
 import Popup from '@/components/popup';
+import SearchBar from '@/components/searchbar';
 
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -43,6 +44,10 @@ export default function HomeScreen() {
     const [name, setName] = useState("");
     const [items, setItems] = useState([]);
     const [recipes, setRecipes] = useState([]);
+    const [breakfast, setBreakfast] = useState([]);
+    const [mainCourse, setMainCourse] = useState([]);
+    const [sideDish, setSideDish] = useState([]);
+
 
     const fetchName = async () => {
         const token = await AsyncStorage.getItem('token');
@@ -78,11 +83,32 @@ export default function HomeScreen() {
         try {
           const response = await axios.post("http://127.0.0.1:5001/get-recipe", { items });
           setRecipes(response.data);
-          console.log(response.data);
+          console.log(response.data)
         } catch (error) {
           console.log(error);
         }
       };
+
+      const fetchCategory = async (type) => {
+        try {
+            const response = await axios.post("http://127.0.0.1:5001/get-type", {type}, {
+                headers: {"Content-Type": "application/json"},
+            });
+            if(type == "Breakfast")
+            {
+                setBreakfast(response.data.results);
+                console.log(response.data, "BREAKFAST");
+            }
+            else if (type == "main course") {
+                setMainCourse(response.data.results);
+            }
+            else {
+                setSideDish(response.data.results);
+            }
+        } catch (error) {
+            console.log(error, "there was an error with fetch category");
+        }
+      }
 
       useEffect(() => {
         const fetchAll = async () => {
@@ -90,6 +116,10 @@ export default function HomeScreen() {
           const realItems = await fetchItems();
           console.log("Items being sent to get-recipe:", realItems);
           await fetchRecipes(realItems);
+          console.log("STOP");
+          await fetchCategory("Breakfast");
+          console.log("STOP");
+          await fetchCategory("main course");
         };
         fetchAll();
       }, []);
@@ -122,6 +152,7 @@ export default function HomeScreen() {
             <Pressable onPress={() => {navigation.navigate('profile')}} style={styles.profileCircle}/>
             <Text style={styles.profileNameText}>Hello {name || '...'}</Text>
             <Text style={{color: 'rgba(88, 137, 129, 0.57)', fontSize: 20, fontFamily: "Inter_600SemiBold"}}>Let's start cooking</Text>
+            <SearchBar/>
 
             {/* categories */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
@@ -136,63 +167,51 @@ export default function HomeScreen() {
             <Text style={styles.recipesText}>Recipes for you</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
             {recipesForYou.map((recipe, index) => (
-    <Pressable key={index} style={[styles.categoryButton, { width: 225, height: 134, overflow: 'hidden' }]}>
-        {recipe.image && (
-            <ImageBackground source={{ uri: recipe.image }} style={styles.recipeImageBackground}>
-                <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row' }}>
-                    <Text style={styles.recipeText}>{recipe.title}</Text>
-                    <Text style={styles.recipeText}>{recipe.usedIngredientCount} used</Text>
-                </View>
-            </ImageBackground>
-        )}
-    </Pressable>
-))}
+            <Pressable key={index} style={[styles.categoryButton, { width: 225, height: 134, overflow: 'hidden' }]}>
+                {recipe.image && (
+                    <ImageBackground source={{ uri: recipe.image }} style={styles.recipeImageBackground}>
+                        <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row' }}>
+                            <Text style={styles.recipeText}>{recipe.title}</Text>
+                            <Text style={styles.recipeText}>{recipe.usedIngredientCount} used</Text>
+                        </View>
+                    </ImageBackground>
+                )}
+            </Pressable>
+            ))}
 
             </ScrollView>
 
-            <Text>Popular recipes</Text>
+            <Text style={styles.recipesText}>Breakfast</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
-                {recipesForYou.map((recipeName, index) => {
-                    const recipeImage = getRecipeData(recipeName);
-                    const recipeTime = getRecipeTime(recipeName);
-                    return (
-                        <Pressable key={index} style={[styles.categoryButton, {width: 225,
-                            height: 134, overflow: 'hidden',}]}>
-                            {/* Add ImageBackground and Text inside it */}
-                            {recipeImage && (
-                                <ImageBackground source={{ uri: recipeImage }} style={styles.recipeImageBackground}>
-                                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row'}}>
-                                        <Text style={styles.recipeText}>{recipeName}</Text>
-                                        <Text style={styles.recipeText}>{recipeTime}</Text>
-                                    </View>
-                                </ImageBackground>
-                            )}
-                        </Pressable>
-                    );
-                })}
+                {breakfast.map((recipe, index) => (
+                <Pressable key={index} style={[styles.categoryButton, { width: 225, height: 134, overflow: 'hidden' }]}>
+                    {recipe.image && (
+                        <ImageBackground source={{ uri: recipe.image }} style={styles.recipeImageBackground}>
+                            <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row' }}>
+                                <Text style={styles.recipeText}>{recipe.title}</Text>
+                            </View>
+                        </ImageBackground>
+                    )}
+                </Pressable>
+                ))}
             </ScrollView>
 
-            <Text>Breakfast</Text>
+            <Text style={styles.recipesText}>Main Course</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
-                {recipesForYou.map((recipeName, index) => {
-                    const recipeImage = getRecipeData(recipeName);
-                    const recipeTime = getRecipeTime(recipeName);
-                    return (
-                        <Pressable key={index} style={[styles.categoryButton, {width: 225,
-                            height: 134, overflow: 'hidden',}]}>
-                            {/* Add ImageBackground and Text inside it */}
-                            {recipeImage && (
-                                <ImageBackground source={{ uri: recipeImage }} style={styles.recipeImageBackground}>
-                                    <View style={{backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row'}}>
-                                        <Text style={styles.recipeText}>{recipeName}</Text>
-                                        <Text style={styles.recipeText}>{recipeTime}</Text>
-                                    </View>
-                                </ImageBackground>
-                            )}
-                        </Pressable>
-                    );
-                })}
+                {mainCourse.map((recipe, index) => (
+                <Pressable key={index} style={[styles.categoryButton, { width: 225, height: 134, overflow: 'hidden' }]}>
+                    {recipe.image && (
+                        <ImageBackground source={{ uri: recipe.image }} style={styles.recipeImageBackground}>
+                            <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.38)', width: '100%', alignItems: 'center', height: 40, justifyContent: 'center', flexDirection: 'row' }}>
+                                <Text style={styles.recipeText}>{recipe.title}</Text>
+                                <Text style={styles.recipeText}>{recipe.usedIngredientCount} used</Text>
+                            </View>
+                        </ImageBackground>
+                    )}
+                </Pressable>
+                ))}
             </ScrollView>
+
             </ScrollView>
             <Popup style={{ position: "absolute", bottom: 60, alignSelf: 'flex-end', right: 20}} />
         </SafeAreaView>
@@ -236,7 +255,7 @@ const styles = StyleSheet.create({
     recipesText: {
         fontFamily: "Inter_600SemiBold",
         fontSize: 24,
-        marginBottom: 10,
+        marginBottom: 0,
     },
     recipeImageBackground: {
         flex: 1,
