@@ -6,12 +6,9 @@ import { Text, View } from '@/components/Themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Popup from '@/components/popup';
-<<<<<<< HEAD
 import { useNavigation } from '@react-navigation/native'; // to access profile page when in items section
-=======
-import SearchBar from '@/components/searchbar';
 
->>>>>>> f6535762628d8d2215079529640cc52639bd8489
+import SearchBar from '@/components/searchbar';
 import {
   useFonts,
   Inter_100Thin,
