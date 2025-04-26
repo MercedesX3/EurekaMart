@@ -6,6 +6,7 @@ import { Text, View } from '@/components/Themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import Popup from '@/components/popup';
+import SearchBar from '@/components/searchbar';
 
 import {
   useFonts,
@@ -105,7 +106,7 @@ export default function ItemsScreen() {
             <View style={styles.profileCircle}/>
             <Text style={styles.profileNameText}>Your refrigerator</Text>
             <Text style={{color: 'rgba(88, 137, 129, 0.57)', fontSize: 20, fontFamily: "Inter_600SemiBold"}}>Let's see what you have!</Text>
-
+            <SearchBar/>
             {/* categories */}
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesContainer}>
                 {categories.map((category, index) => (
