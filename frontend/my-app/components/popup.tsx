@@ -21,7 +21,7 @@ type PopupProps = {
   style?: ViewStyle | ViewStyle[];
 };
 
-const Popup = ({ style }: PopupProps) => {
+const Popup = ({ style, onSave }: PopupProps) => {
   const [isCircle, setIsCircle] = useState(true);
   const [itemName, setItemName] = useState("");
   const [quantity, setItemQuantity] = useState("");
@@ -70,7 +70,8 @@ const Popup = ({ style }: PopupProps) => {
           Authorization: token,
         }
       });
-  
+
+      if (onSave) onSave();
       console.log("Item added:", response.data);
     } catch (error) {
       console.error("Add item error:", error.response?.data || error.message);

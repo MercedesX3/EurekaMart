@@ -49,6 +49,7 @@ export default function HomeScreen() {
     const [searchedRecipes, setSearchedRecipes] = useState([]);
     const [searchButtonStatus, setSearchButtonStatus] = useState(false);
     const [searchedText, setSearchText] = useState("");
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const fetchName = async () => {
         const token = await AsyncStorage.getItem('token');
@@ -133,7 +134,8 @@ export default function HomeScreen() {
           await fetchCategory("main course");
         };
         fetchAll();
-      }, []);
+        console.log("REFRESH");
+      }, [refreshKey]);
 
     const getCategories = () => {
         return ['Chinese', 'Vegetarian', 'American', 'Italian', 'Mexican'];
@@ -241,7 +243,7 @@ export default function HomeScreen() {
             )}
 
             </ScrollView>
-            <Popup style={{ position: "absolute", bottom: 60, alignSelf: 'flex-end', right: 20}} />
+            <Popup style={{ position: "absolute", bottom: 60, alignSelf: 'flex-end', right: 20}}  onSave={() => setRefreshKey(prev => prev + 1)}/>
         </SafeAreaView>
     )
 }
