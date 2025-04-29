@@ -186,7 +186,7 @@ app.post("/add-item", async (req, res) => {
 });
 
 app.post("/get-search", async (req, res) => {
-    const title = req.body.type;
+    const title = req.body.search;
 
     try {
         const response = await axios.get(
